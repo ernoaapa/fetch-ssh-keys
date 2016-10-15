@@ -5,8 +5,12 @@
 
 ## Usage
 ```shell
-# Fetch users from GitHub and output in SSH authorized_keys format
-fetch-ssh-keys github --output ssh
+fetch-ssh-keys <source name> <parameters>
+```
+
+For example fetch users public SSH keys from GitHub `my-lovely-team` team in `my-awesome-company` organization and output in SSH authorized_keys format
+```shell
+fetch-ssh-keys github --organization my-awesome-company --team my-lovely-team --token YOUR-TOKEN-HERE
 ```
 
 Tool can be used for example to automatically update `.ssh/authorized_keys` file by adding the script to cron job.
@@ -16,7 +20,17 @@ Tool can be used for example to automatically update `.ssh/authorized_keys` file
 - Give execution rights (`chmod +x fetch-ssh-keys`) and add it into your $PATH
 
 ### Configuration
-TODO
+| Parameter      | Required | Description                                                                                               |
+|----------------|----------|-----------------------------------------------------------------------------------------------------------|
+| --output       | Yes      | Output format. Only ssh authorized_keys format supported for now                                          |
+
+#### GitHub
+| Parameter      | Required | Description                                                                                               |
+|----------------|----------|-----------------------------------------------------------------------------------------------------------|
+| --organization | Yes      | Name of the organization which members keys to pick                                                       |
+| --team         | No       | Name of the team which members keys to pick                                                               |
+| --token        | No       | GitHub API token to use for communication. Without token you get only public members of the organization. |
+| --public-only  | No       | Return only members what are publicly members of the given organization                                   |
 
 ## Development
 ### Get dependencies
