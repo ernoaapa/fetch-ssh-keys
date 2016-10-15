@@ -67,7 +67,7 @@ func main() {
 					log.Fatalln("Failed to fetch keys", err)
 				}
 
-				log.Println(output.Build(c.GlobalString("output"), keys))
+				println(output.Build(c.GlobalString("output"), keys))
 				return nil
 			},
 		},
