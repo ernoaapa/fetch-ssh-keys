@@ -48,6 +48,10 @@ func main() {
 					Name:  "public-only",
 					Usage: "Return only public members of organization",
 				},
+				cli.StringFlag{
+					Name:  "team",
+					Usage: "Return only members of one team",
+				},
 			},
 			Action: func(c *cli.Context) error {
 				if c.String("organization") == "" {
@@ -56,6 +60,7 @@ func main() {
 
 				keys, err := fetch.GitHubKeys(c.String("organization"), fetch.GithubFetchParams{
 					Token:             c.String("token"),
+					TeamName:          c.String("team"),
 					PublicMembersOnly: c.Bool("public-only"),
 				})
 				if err != nil {

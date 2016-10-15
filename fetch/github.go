@@ -1,6 +1,9 @@
 package fetch
 
 import (
+	"fmt"
+	"strings"
+
 	log "github.com/Sirupsen/logrus"
 	"github.com/google/go-github/github"
 	"golang.org/x/oauth2"
@@ -9,6 +12,7 @@ import (
 // GithubFetchParams contains all parameters what are required for fetching tokens from GitHub
 type GithubFetchParams struct {
 	Token             string
+	TeamName          string
 	PublicMembersOnly bool
 }
 
@@ -50,8 +54,32 @@ func getClient(params GithubFetchParams) *github.Client {
 }
 
 func fetchUsers(client *github.Client, organizationName string, params GithubFetchParams) ([]*github.User, error) {
+	if params.TeamName != "" {
+		teamID, err := resolveTeamID(client, organizationName, params.TeamName)
+		if err != nil {
+			return []*github.User{}, err
+		}
+		users, _, err := client.Organizations.ListTeamMembers(teamID, &github.OrganizationListTeamMembersOptions{})
+		return users, err
+	}
+
 	users, _, err := client.Organizations.ListMembers(organizationName, &github.ListMembersOptions{
 		PublicOnly: params.PublicMembersOnly,
 	})
 	return users, err
+}
+
+func resolveTeamID(client *github.Client, organizationName, teamName string) (int, error) {
+	teams, _, err := client.Organizations.ListTeams(organizationName, &github.ListOptions{})
+	if err != nil {
+		return -1, err
+	}
+
+	for _, team := range teams {
+		if strings.EqualFold(*team.Name, teamName) {
+			return *team.ID, nil
+		}
+	}
+
+	return -1, fmt.Errorf("Unable to find team [%s] from organization [%s]", teamName, organizationName)
 }
