@@ -24,7 +24,7 @@ func main() {
 	app.Usage = "Fetch user public SSH keys"
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
-			Name:  "output, o",
+			Name:  "format, f",
 			Usage: "Output format. One of: ssh",
 			Value: "ssh",
 		},
@@ -67,8 +67,7 @@ func main() {
 					log.Fatalln("Failed to fetch keys", err)
 				}
 
-				println(output.Build(c.GlobalString("output"), keys))
-				return nil
+				return output.Write(c.GlobalString("format"), c.Args().Get(0), keys)
 			},
 		},
 	}
