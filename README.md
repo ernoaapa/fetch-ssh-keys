@@ -5,24 +5,24 @@
 
 ## Usage
 ```shell
-fetch-ssh-keys <source name> <parameters>
+fetch-ssh-keys <source name> <parameters> <output file>
 ```
 
 For example fetch users public SSH keys from GitHub `my-lovely-team` team in `my-awesome-company` organization and output in SSH authorized_keys format
 ```shell
-fetch-ssh-keys github --organization my-awesome-company --team my-lovely-team --token YOUR-TOKEN-HERE
+fetch-ssh-keys github --organization my-awesome-company --team my-lovely-team --token YOUR-TOKEN-HERE ./the-keys
 ```
 
-Tool can be used for example to automatically update `.ssh/authorized_keys` file by adding the script to cron job.
+Tool can be used for example to automatically update `.ssh/authorized_keys` file by giving path to `.ssh/authorized_keys` as last argument and adding the script to cron job.
 
 ## Installation
 - Download binary from [releases](https://github.com/ernoaapa/fetch-ssh-keys/releases)
 - Give execution rights (`chmod +x fetch-ssh-keys`) and add it into your $PATH
 
 ### Configuration
-| Parameter      | Required | Description                                                                                               |
-|----------------|----------|-----------------------------------------------------------------------------------------------------------|
-| --output       | Yes      | Output format. Only ssh authorized_keys format supported for now                                          |
+| Parameter      | Required          | Description                                                                                               |
+|----------------|-------------------|-----------------------------------------------------------------------------------------------------------|
+| --format       | No (default ssh)  | Output format. Only ssh authorized_keys format supported for now                                          |
 
 #### GitHub
 | Parameter      | Required | Description                                                                                               |
@@ -38,7 +38,7 @@ Tool can be used for example to automatically update `.ssh/authorized_keys` file
 go get ./...
 ```
 
-### Run stastd-exec
+### Run
 ```shell
 go run main.go github --output ssh
 ```
