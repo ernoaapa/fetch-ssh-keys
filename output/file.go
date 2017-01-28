@@ -1,7 +1,7 @@
 package output
 
 import (
-	"io/ioutil"
+	"github.com/youtube/vitess/go/ioutil2"
 	"os"
 )
 
@@ -20,5 +20,5 @@ func NewFileWriter(targetFile string) *FileWriter {
 }
 
 func (w *FileWriter) write(output string) error {
-	return ioutil.WriteFile(w.targetFile, []byte(output), w.fileMode)
+	return ioutil2.WriteFileAtomic(w.targetFile, []byte(output), w.fileMode)
 }
