@@ -10,6 +10,10 @@ import (
 	"github.com/urfave/cli"
 )
 
+var (
+	VersionString string
+)
+
 // StatsdConfig for statsd client
 type StatsdConfig struct {
 	Host       string `default:"localhost"`
@@ -29,6 +33,7 @@ func main() {
 			Value: "ssh",
 		},
 	}
+	app.Version = VersionString
 	app.Commands = []cli.Command{
 		{
 			Name:  "github",
