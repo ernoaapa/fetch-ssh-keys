@@ -2,6 +2,7 @@ package output
 
 import (
 	"io/ioutil"
+	"os"
 	"testing"
 
 	log "github.com/Sirupsen/logrus"
@@ -15,7 +16,7 @@ func TestFile(t *testing.T) {
 	file, createErr := ioutil.TempFile("", "example")
 	assert.NoError(t, createErr, "Unable to create temp file")
 
-	writer := NewFileWriter(file.Name())
+	writer := NewFileWriter(file.Name(), 0640)
 
 	writer.write("foobar")
 	writer.write("foobar-second-time")
@@ -23,5 +24,7 @@ func TestFile(t *testing.T) {
 	fileBytes, readErr := ioutil.ReadFile(file.Name())
 	assert.NoError(t, readErr, "Unable to read temp file")
 
+	info, _ := os.Stat(file.Name())
+	assert.Equal(t, 0640, int(info.Mode().Perm()), "File permission wasn't set as expected")
 	assert.Equal(t, "foobar-second-time", string(fileBytes), "FileWriter didnt wrote expected output to file")
 }

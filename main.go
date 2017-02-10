@@ -33,6 +33,11 @@ func main() {
 			Usage: "Output format. One of: ssh",
 			Value: "ssh",
 		},
+		cli.StringFlag{
+			Name:  "file-mode",
+			Usage: "File permissions for file",
+			Value: "0600",
+		},
 	}
 	app.Version = VersionString
 	app.Commands = []cli.Command{
@@ -73,7 +78,7 @@ func main() {
 					log.Fatalln("Failed to fetch keys", err)
 				}
 
-				return output.Write(c.GlobalString("format"), c.Args().Get(0), keys)
+				return output.Write(c.GlobalString("format"), c.Args().Get(0), os.FileMode(c.GlobalInt("file-mode")), keys)
 			},
 		},
 	}
