@@ -15,14 +15,6 @@ var (
 	VersionString string
 )
 
-// StatsdConfig for statsd client
-type StatsdConfig struct {
-	Host       string `default:"localhost"`
-	Port       int    `default:"8125"`
-	Prefix     string `default:"stats"`
-	MetricName string `envconfig:"metric_name",required:"true"`
-}
-
 func main() {
 	app := cli.NewApp()
 	app.Name = "fetch-ssh-keys"
