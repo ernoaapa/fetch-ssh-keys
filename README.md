@@ -1,4 +1,8 @@
 # fetch-ssh-keys
+
+[![Build Status](https://travis-ci.org/ernoaapa/fetch-ssh-keys.svg?branch=master)](https://travis-ci.org/ernoaapa/fetch-ssh-keys)
+[![Go Report Card](https://goreportcard.com/badge/github.com/ernoaapa/fetch-ssh-keys)](https://goreportcard.com/report/github.com/ernoaapa/fetch-ssh-keys)
+
 `fetch-ssh-keys` is small shell command to get users public SSH keys from different cloud services like [GitHub](https://github.com).
 
 > Note: Tested only on Linux and Mac. If you test on any other platform, please me know!
