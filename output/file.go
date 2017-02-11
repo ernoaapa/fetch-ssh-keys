@@ -12,10 +12,10 @@ type FileWriter struct {
 }
 
 // NewFileWriter creates new FileWriter what writes to targetFile
-func NewFileWriter(targetFile string) *FileWriter {
+func NewFileWriter(targetFile string, perm os.FileMode) *FileWriter {
 	return &FileWriter{
 		targetFile: targetFile,
-		fileMode:   0600,
+		fileMode:   perm,
 	}
 }
 

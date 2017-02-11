@@ -12,7 +12,7 @@ func TestSsh(t *testing.T) {
 	log.SetLevel(log.DebugLevel)
 
 	keys := map[string][]string{
-		"ernoaapa": []string{
+		"ernoaapa": {
 			"ssh-rsa AAAAB3NzsshPublicKeyBlah",
 		},
 	}

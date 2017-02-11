@@ -10,6 +10,7 @@ import (
 	"github.com/urfave/cli"
 )
 
+// Version string to be set at compile time via command line (-ldflags "-X main.VersionString=1.2.3")
 var (
 	VersionString string
 )
@@ -31,6 +32,11 @@ func main() {
 			Name:  "format, f",
 			Usage: "Output format. One of: ssh",
 			Value: "ssh",
+		},
+		cli.StringFlag{
+			Name:  "file-mode",
+			Usage: "File permissions for file",
+			Value: "0600",
 		},
 	}
 	app.Version = VersionString
@@ -72,7 +78,7 @@ func main() {
 					log.Fatalln("Failed to fetch keys", err)
 				}
 
-				return output.Write(c.GlobalString("format"), c.Args().Get(0), keys)
+				return output.Write(c.GlobalString("format"), c.Args().Get(0), os.FileMode(c.GlobalInt("file-mode")), keys)
 			},
 		},
 	}
