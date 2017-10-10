@@ -51,9 +51,9 @@ func main() {
 					Name:  "public-only",
 					Usage: "Return only public members of organization",
 				},
-				cli.StringFlag{
+				cli.StringSliceFlag{
 					Name:  "team",
-					Usage: "Return only members of one team",
+					Usage: "Return only members of `TEAM` (this option can be used multiple times for multiple teams)",
 				},
 			},
 			Action: func(c *cli.Context) error {
@@ -63,7 +63,7 @@ func main() {
 
 				keys, err := fetch.GitHubKeys(c.String("organization"), fetch.GithubFetchParams{
 					Token:             c.String("token"),
-					TeamName:          c.String("team"),
+					TeamNames:         c.StringSlice("team"),
 					PublicMembersOnly: c.Bool("public-only"),
 				})
 				if err != nil {

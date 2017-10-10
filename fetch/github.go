@@ -12,7 +12,7 @@ import (
 // GithubFetchParams contains all parameters what are required for fetching tokens from GitHub
 type GithubFetchParams struct {
 	Token             string
-	TeamName          string
+	TeamNames         []string
 	PublicMembersOnly bool
 }
 
@@ -54,13 +54,23 @@ func getClient(params GithubFetchParams) *github.Client {
 }
 
 func fetchUsers(client *github.Client, organizationName string, params GithubFetchParams) ([]*github.User, error) {
-	if params.TeamName != "" {
-		teamID, err := resolveTeamID(client, organizationName, params.TeamName)
-		if err != nil {
-			return []*github.User{}, err
+	if len(params.TeamNames) > 0 {
+		var users []*github.User
+		for _, teamName := range params.TeamNames {
+			teamID, err := resolveTeamID(client, organizationName, teamName)
+			if err != nil {
+				return []*github.User{}, err
+			}
+
+			teamUsers, _, err := client.Organizations.ListTeamMembers(teamID, &github.OrganizationListTeamMembersOptions{})
+			if err != nil {
+				return []*github.User{}, err
+			}
+
+			users = append(users, teamUsers...)
 		}
-		users, _, err := client.Organizations.ListTeamMembers(teamID, &github.OrganizationListTeamMembersOptions{})
-		return users, err
+
+		return users, nil
 	}
 
 	users, _, err := client.Organizations.ListMembers(organizationName, &github.ListMembersOptions{
