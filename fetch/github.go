@@ -1,6 +1,7 @@
 package fetch
 
 import (
+	"context"
 	"fmt"
 	"strings"
 
@@ -12,12 +13,14 @@ import (
 // GithubFetchParams contains all parameters what are required for fetching tokens from GitHub
 type GithubFetchParams struct {
 	Token             string
-	TeamName          string
+	TeamNames         []string
 	PublicMembersOnly bool
 }
 
 // GitHubKeys fetches organization users public SSH key from GitHub
 func GitHubKeys(organizationName string, params GithubFetchParams) (map[string][]string, error) {
+	ctx := context.Background()
+
 	client := getClient(params)
 	users, err := fetchUsers(client, organizationName, params)
 	if err != nil {
@@ -28,7 +31,7 @@ func GitHubKeys(organizationName string, params GithubFetchParams) (map[string][
 	result := map[string][]string{}
 	for _, user := range users {
 		username := *user.Login
-		keys, _, err := client.Users.ListKeys(username, &github.ListOptions{})
+		keys, _, err := client.Users.ListKeys(ctx, username, &github.ListOptions{})
 		if err != nil {
 			return map[string][]string{}, err
 		}
@@ -54,23 +57,37 @@ func getClient(params GithubFetchParams) *github.Client {
 }
 
 func fetchUsers(client *github.Client, organizationName string, params GithubFetchParams) ([]*github.User, error) {
-	if params.TeamName != "" {
-		teamID, err := resolveTeamID(client, organizationName, params.TeamName)
-		if err != nil {
-			return []*github.User{}, err
+	ctx := context.Background()
+
+	if len(params.TeamNames) > 0 {
+		var users []*github.User
+		for _, teamName := range params.TeamNames {
+			teamID, err := resolveTeamID(client, organizationName, teamName)
+			if err != nil {
+				return []*github.User{}, err
+			}
+
+			teamUsers, _, err := client.Organizations.ListTeamMembers(ctx, teamID, &github.OrganizationListTeamMembersOptions{})
+			if err != nil {
+				return []*github.User{}, err
+			}
+
+			users = append(users, teamUsers...)
 		}
-		users, _, err := client.Organizations.ListTeamMembers(teamID, &github.OrganizationListTeamMembersOptions{})
-		return users, err
+
+		return users, nil
 	}
 
-	users, _, err := client.Organizations.ListMembers(organizationName, &github.ListMembersOptions{
+	users, _, err := client.Organizations.ListMembers(ctx, organizationName, &github.ListMembersOptions{
 		PublicOnly: params.PublicMembersOnly,
 	})
 	return users, err
 }
 
 func resolveTeamID(client *github.Client, organizationName, teamName string) (int, error) {
-	teams, _, err := client.Organizations.ListTeams(organizationName, &github.ListOptions{})
+	ctx := context.Background()
+
+	teams, _, err := client.Organizations.ListTeams(ctx, organizationName, &github.ListOptions{})
 	if err != nil {
 		return -1, err
 	}
