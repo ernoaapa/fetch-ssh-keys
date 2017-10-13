@@ -1,6 +1,7 @@
 package fetch
 
 import (
+	"os"
 	"testing"
 
 	log "github.com/Sirupsen/logrus"
@@ -11,7 +12,11 @@ import (
 func TestFetchPublicKeys(t *testing.T) {
 	log.SetLevel(log.DebugLevel)
 
-	keys, err := GitHubKeys("devopsfinland", GithubFetchParams{PublicMembersOnly: true})
+	keys, err := GitHubKeys("devopsfinland", GithubFetchParams{
+		// Use token if it's available to avoid hitting API rate limits with the tests...
+		Token:             os.Getenv("GITHUB_TOKEN"),
+		PublicMembersOnly: true,
+	})
 
 	assert.NoError(t, err, "Fetch GitHub keys returned error")
 	assert.True(t, len(keys) > 0, "should return SSH at least one public key")
