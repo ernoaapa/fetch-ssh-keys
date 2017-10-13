@@ -19,6 +19,7 @@ after_success:
   - ghr --username ernoaapa --token $GITHUB_TOKEN --replace --prerelease --debug pre-release dist/
 deploy:
   provider: script
+  skip_cleanup: true
   script: ghr --username ernoaapa --token $GITHUB_TOKEN --replace --debug $(git tag -l --contains HEAD) dist/
   on:
     tags: true
