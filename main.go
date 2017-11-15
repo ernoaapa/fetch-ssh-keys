@@ -1,12 +1,15 @@
 package main
 
 import (
+	"fmt"
 	"os"
 
 	log "github.com/Sirupsen/logrus"
+	"github.com/pkg/errors"
 
 	"github.com/ernoaapa/fetch-ssh-keys/fetch"
 	"github.com/ernoaapa/fetch-ssh-keys/output"
+	"github.com/ernoaapa/fetch-ssh-keys/utils"
 	"github.com/urfave/cli"
 )
 
@@ -55,22 +58,52 @@ func main() {
 					Name:  "team",
 					Usage: "Return only members of `TEAM` (this option can be used multiple times for multiple teams)",
 				},
+				cli.StringSliceFlag{
+					Name:  "user",
+					Usage: "Return given user public ssh keys (this option can be used multiple times for multiple users)",
+				},
 			},
 			Action: func(c *cli.Context) error {
-				if c.String("organization") == "" {
-					log.Fatalln("You must give --organization value")
+				var (
+					token        = c.String("token")
+					organisation = c.String("organization")
+					teams        = c.StringSlice("team")
+					users        = c.StringSlice("user")
+					publicOnly   = c.Bool("public-only")
+
+					orgKeys  map[string][]string
+					userKeys map[string][]string
+
+					target   = c.Args().Get(0)
+					fileMode = os.FileMode(c.GlobalInt("file-mode"))
+					format   = c.GlobalString("format")
+
+					err error
+				)
+
+				if organisation == "" && len(users) == 0 {
+					return fmt.Errorf("You must give either --organisation or --user parameter")
 				}
 
-				keys, err := fetch.GitHubKeys(c.String("organization"), fetch.GithubFetchParams{
-					Token:             c.String("token"),
-					TeamNames:         c.StringSlice("team"),
-					PublicMembersOnly: c.Bool("public-only"),
-				})
-				if err != nil {
-					log.Fatalln("Failed to fetch keys", err)
+				if c.IsSet("organization") {
+					orgKeys, err = fetch.GitHubOrganisationKeys(organisation, fetch.GithubFetchParams{
+						Token:             token,
+						TeamNames:         teams,
+						PublicMembersOnly: publicOnly,
+					})
+					if err != nil {
+						return errors.Wrapf(err, "Failed to fetch keys from organisation %s", organisation)
+					}
 				}
 
-				return output.Write(c.GlobalString("format"), c.Args().Get(0), os.FileMode(c.GlobalInt("file-mode")), keys)
+				if c.IsSet("user") {
+					userKeys, err = fetch.GitHubUsers(users, token)
+					if err != nil {
+						return errors.Wrap(err, "Failed to fetch GitHub user(s) keys")
+					}
+				}
+
+				return output.Write(format, target, fileMode, utils.MergeKeys(orgKeys, userKeys))
 			},
 		},
 	}

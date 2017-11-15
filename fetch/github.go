@@ -17,39 +17,33 @@ type GithubFetchParams struct {
 	PublicMembersOnly bool
 }
 
-// GitHubKeys fetches organization users public SSH key from GitHub
-func GitHubKeys(organizationName string, params GithubFetchParams) (map[string][]string, error) {
-	ctx := context.Background()
-
-	client := getClient(params)
+// GitHubOrganisationKeys fetches organization users public SSH key from GitHub
+func GitHubOrganisationKeys(organizationName string, params GithubFetchParams) (map[string][]string, error) {
+	client := getClient(params.Token)
 	users, err := fetchUsers(client, organizationName, params)
 	if err != nil {
 		return map[string][]string{}, err
 	}
 	log.Debugf("Users found: %d", len(users))
 
-	result := map[string][]string{}
+	usernames := []string{}
 	for _, user := range users {
-		username := *user.Login
-		keys, _, err := client.Users.ListKeys(ctx, username, &github.ListOptions{})
-		if err != nil {
-			return map[string][]string{}, err
-		}
-
-		result[username] = make([]string, len(keys))
-
-		for index, key := range keys {
-			result[username][index] = *key.Key
-		}
+		usernames = append(usernames, *user.Login)
 	}
 
-	return result, nil
+	return fetchUserKeys(client, usernames, params.Token)
 }
 
-func getClient(params GithubFetchParams) *github.Client {
-	if len(params.Token) > 0 {
+// GitHubUsers fetches users public SSH keys from GitHub
+func GitHubUsers(usernames []string, token string) (map[string][]string, error) {
+	client := getClient(token)
+	return fetchUserKeys(client, usernames, token)
+}
+
+func getClient(token string) *github.Client {
+	if len(token) > 0 {
 		ts := oauth2.StaticTokenSource(
-			&oauth2.Token{AccessToken: params.Token},
+			&oauth2.Token{AccessToken: token},
 		)
 		return github.NewClient(oauth2.NewClient(oauth2.NoContext, ts))
 	}
@@ -99,4 +93,24 @@ func resolveTeamID(client *github.Client, organizationName, teamName string) (in
 	}
 
 	return -1, fmt.Errorf("Unable to find team [%s] from organization [%s]", teamName, organizationName)
+}
+
+func fetchUserKeys(client *github.Client, usernames []string, token string) (map[string][]string, error) {
+	ctx := context.Background()
+
+	result := map[string][]string{}
+	for _, username := range usernames {
+		keys, _, err := client.Users.ListKeys(ctx, username, &github.ListOptions{})
+		if err != nil {
+			return map[string][]string{}, err
+		}
+
+		result[username] = make([]string, len(keys))
+
+		for index, key := range keys {
+			result[username][index] = *key.Key
+		}
+	}
+
+	return result, nil
 }

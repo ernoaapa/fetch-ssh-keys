@@ -14,7 +14,11 @@ fetch-ssh-keys <source name> <parameters> <output file>
 
 For example fetch users public SSH keys from GitHub `my-lovely-team` team in `my-awesome-company` organization and output in SSH authorized_keys format
 ```shell
+# Fetch 'my-lovely-team' keys in 'my-awesome-company' organisation
 fetch-ssh-keys github --organization my-awesome-company --team my-lovely-team --token YOUR-TOKEN-HERE ./the-keys
+
+# Fetch 'ernoaapa' and 'arnested' public keys
+fetch-ssh-keys github --user ernoaapa --user arnested  --token YOUR-TOKEN-HERE ./the-keys
 ```
 
 Tool can be used for example to automatically update `.ssh/authorized_keys` file by giving path to `.ssh/authorized_keys` as last argument and adding the script to cron job.
@@ -30,12 +34,15 @@ Tool can be used for example to automatically update `.ssh/authorized_keys` file
 | --file-mode    | No (default 0600) | File permissions when writing to a file                                                                   |
 
 #### GitHub
-| Parameter      | Required | Description                                                                                               |
-|----------------|----------|-----------------------------------------------------------------------------------------------------------|
-| --organization | Yes      | Name of the organization which members keys to pick                                                       |
-| --team         | No       | Name of the team which members keys to pick                                                               |
-| --token        | No       | GitHub API token to use for communication. Without token you get only public members of the organization. |
-| --public-only  | No       | Return only members what are publicly members of the given organization                                   |
+| Parameter      | Description                                                                                               |
+|----------------|-----------------------------------------------------------------------------------------------------------|
+| --organization | Name of the organization which members keys to pick                                                       |
+| --team         | Name of the team which members keys to pick                                                               |
+| --user         | Name of the user which keys to pick                                                                       |
+| --token        | GitHub API token to use for communication. Without token you get only public members of the organization. |
+| --public-only  | Return only members what are publicly members of the given organization                                   |
+
+You can give `--organisation` (optionally combined with `--team` flag) and/or one or more `--user` flags.
 
 ## Development
 ### Get dependencies
