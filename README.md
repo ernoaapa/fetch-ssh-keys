@@ -37,7 +37,7 @@ Tool can be used for example to automatically update `.ssh/authorized_keys` file
 | Parameter      | Description                                                                                               |
 |----------------|-----------------------------------------------------------------------------------------------------------|
 | --organization | Name of the organization which members keys to pick                                                       |
-| --team         | Name of the team which members keys to pick                                                               |
+| --team         | Name or slug of the team which members keys to pick                                                               |
 | --user         | Name of the user which keys to pick                                                                       |
 | --token        | GitHub API token to use for communication. Without token you get only public members of the organization. |
 | --public-only  | Return only members what are publicly members of the given organization                                   |
