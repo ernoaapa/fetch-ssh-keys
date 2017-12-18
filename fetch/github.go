@@ -87,7 +87,7 @@ func resolveTeamID(client *github.Client, organizationName, teamName string) (in
 	}
 
 	for _, team := range teams {
-		if strings.EqualFold(*team.Name, teamName) {
+		if strings.EqualFold(*team.Name, teamName) || strings.EqualFold(*team.Slug, teamName) {
 			return *team.ID, nil
 		}
 	}
