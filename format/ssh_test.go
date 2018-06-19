@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestSsh(t *testing.T) {
+func TestSshWithoutComment(t *testing.T) {
 	log.SetLevel(log.DebugLevel)
 
 	keys := map[string][]string{
@@ -17,7 +17,21 @@ func TestSsh(t *testing.T) {
 		},
 	}
 
-	result := ssh(keys)
+	result := ssh(keys, "")
 
 	assert.Equal(t, "ssh-rsa AAAAB3NzsshPublicKeyBlah ernoaapa\n", result, "Returned invalid ssh output")
+}
+
+func TestSshWithComment(t *testing.T) {
+	log.SetLevel(log.DebugLevel)
+
+	keys := map[string][]string{
+		"ernoaapa": {
+			"ssh-rsa AAAAB3NzsshPublicKeyBlah",
+		},
+	}
+
+	result := ssh(keys, "Generated file")
+
+	assert.Equal(t, "# Generated file\nssh-rsa AAAAB3NzsshPublicKeyBlah ernoaapa\n# Generated file\n", result, "Returned invalid ssh output")
 }
