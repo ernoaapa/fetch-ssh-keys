@@ -33,6 +33,10 @@ func main() {
 			Usage: "File permissions for file",
 			Value: "0600",
 		},
+		cli.StringFlag{
+			Name:  "comment",
+			Usage: "Include `COMMENT` at top and bottom",
+		},
 	}
 	app.Version = VersionString
 	app.Commands = []cli.Command{
@@ -77,6 +81,7 @@ func main() {
 					target   = c.Args().Get(0)
 					fileMode = os.FileMode(c.GlobalInt("file-mode"))
 					format   = c.GlobalString("format")
+					comment  = c.GlobalString("comment")
 
 					err error
 				)
@@ -103,7 +108,7 @@ func main() {
 					}
 				}
 
-				return output.Write(format, target, fileMode, utils.MergeKeys(orgKeys, userKeys))
+				return output.Write(format, target, fileMode, utils.MergeKeys(orgKeys, userKeys), comment)
 			},
 		},
 	}

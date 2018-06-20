@@ -32,6 +32,7 @@ Tool can be used for example to automatically update `.ssh/authorized_keys` file
 |----------------|-------------------|-----------------------------------------------------------------------------------------------------------|
 | --format       | No (default ssh)  | Output format. Only ssh authorized_keys format supported for now                                          |
 | --file-mode    | No (default 0600) | File permissions when writing to a file                                                                   |
+| --comment      | No (default none) | Include COMMENT at top and bottom                                                                         |
 
 #### GitHub
 | Parameter      | Description                                                                                               |
