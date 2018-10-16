@@ -61,7 +61,7 @@ func fetchUsers(client *github.Client, organizationName string, params GithubFet
 				return []*github.User{}, err
 			}
 
-			teamUsers, _, err := client.Organizations.ListTeamMembers(ctx, teamID, &github.OrganizationListTeamMembersOptions{})
+			teamUsers, _, err := client.Teams.ListTeamMembers(ctx, teamID, &github.TeamListTeamMembersOptions{})
 			if err != nil {
 				return []*github.User{}, err
 			}
@@ -81,7 +81,7 @@ func fetchUsers(client *github.Client, organizationName string, params GithubFet
 func resolveTeamID(client *github.Client, organizationName, teamName string) (int64, error) {
 	ctx := context.Background()
 
-	teams, _, err := client.Organizations.ListTeams(ctx, organizationName, &github.ListOptions{})
+	teams, _, err := client.Teams.ListTeams(ctx, organizationName, &github.ListOptions{})
 	if err != nil {
 		return -1, err
 	}
