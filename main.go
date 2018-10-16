@@ -64,7 +64,11 @@ func main() {
 				},
 				cli.StringSliceFlag{
 					Name:  "user",
-					Usage: "Return given user public ssh keys (this option can be used multiple times for multiple users)",
+					Usage: "Return given `USER` public ssh keys (this option can be used multiple times for multiple users)",
+				},
+				cli.StringSliceFlag{
+					Name:  "deploy-key",
+					Usage: "Return given `OWNER/REPO` deploy ssh keys (this option can be used multiple times for multiple repositories)",
 				},
 			},
 			Action: func(c *cli.Context) error {
@@ -73,10 +77,12 @@ func main() {
 					organisation = c.String("organization")
 					teams        = c.StringSlice("team")
 					users        = c.StringSlice("user")
+					ownerRepos   = c.StringSlice("deploy-key")
 					publicOnly   = c.Bool("public-only")
 
-					orgKeys  map[string][]string
-					userKeys map[string][]string
+					deployKeys map[string][]string
+					orgKeys    map[string][]string
+					userKeys   map[string][]string
 
 					target   = c.Args().Get(0)
 					fileMode = os.FileMode(c.GlobalInt("file-mode"))
@@ -86,8 +92,8 @@ func main() {
 					err error
 				)
 
-				if organisation == "" && len(users) == 0 {
-					return fmt.Errorf("You must give either --organisation or --user parameter")
+				if organisation == "" && len(users) == 0 && len(ownerRepos) == 0 {
+					return fmt.Errorf("You must give either --organisation or --user or --deploy-key parameter")
 				}
 
 				if c.IsSet("organization") {
@@ -108,7 +114,14 @@ func main() {
 					}
 				}
 
-				return output.Write(format, target, fileMode, utils.MergeKeys(orgKeys, userKeys), comment)
+				if c.IsSet("deploy-key") {
+					deployKeys, err = fetch.GitHubDeployKeys(ownerRepos, token)
+					if err != nil {
+						return errors.Wrap(err, "Failed to fetch GitHub repositories' deploy keys")
+					}
+				}
+
+				return output.Write(format, target, fileMode, utils.MergeKeys(orgKeys, userKeys, deployKeys), comment)
 			},
 		},
 	}
