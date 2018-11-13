@@ -19,6 +19,9 @@ fetch-ssh-keys github --organization my-awesome-company --team my-lovely-team --
 
 # Fetch 'ernoaapa' and 'arnested' public keys
 fetch-ssh-keys github --user ernoaapa --user arnested  --token YOUR-TOKEN-HERE ./the-keys
+
+# Fetch 'ernoaapa/fetch-ssh-keys' deploy keys (requires a Github token with the `repo` or `public_repo` scope)
+fetch-ssh-keys github --deploy-key ernoaapa/fetch-ssh-keys  --token YOUR-TOKEN-HERE ./the-keys
 ```
 
 Tool can be used for example to automatically update `.ssh/authorized_keys` file by giving path to `.ssh/authorized_keys` as last argument and adding the script to cron job.
@@ -40,10 +43,13 @@ Tool can be used for example to automatically update `.ssh/authorized_keys` file
 | --organization | Name of the organization which members keys to pick                                                       |
 | --team         | Name or slug of the team which members keys to pick                                                               |
 | --user         | Name of the user which keys to pick                                                                       |
+| --deploy-key   | Name of the owner/repo which deploy keys to pick                                                          |
 | --token        | GitHub API token to use for communication. Without token you get only public members of the organization. |
 | --public-only  | Return only members what are publicly members of the given organization                                   |
 
-You can give `--organisation` (optionally combined with `--team` flag) and/or one or more `--user` flags.
+You can give `--organisation` (optionally combined with `--team` flag) and/or one or more `--user` or `--deploy-key` flags.
+
+The `--deploy-key` parameter requires a Github token with the `repo` or `public_repo` scope.
 
 ## Development
 ### Get dependencies

@@ -40,6 +40,12 @@ func GitHubUsers(usernames []string, token string) (map[string][]string, error) 
 	return fetchUserKeys(client, usernames, token)
 }
 
+// GitHubDeployKeys fetches repositories' SSH keys from GitHub
+func GitHubDeployKeys(ownerRepos []string, token string) (map[string][]string, error) {
+	client := getClient(token)
+	return fetchDeployKeys(client, ownerRepos, token)
+}
+
 func getClient(token string) *github.Client {
 	if len(token) > 0 {
 		ts := oauth2.StaticTokenSource(
@@ -61,7 +67,7 @@ func fetchUsers(client *github.Client, organizationName string, params GithubFet
 				return []*github.User{}, err
 			}
 
-			teamUsers, _, err := client.Organizations.ListTeamMembers(ctx, teamID, &github.OrganizationListTeamMembersOptions{})
+			teamUsers, _, err := client.Teams.ListTeamMembers(ctx, teamID, &github.TeamListTeamMembersOptions{})
 			if err != nil {
 				return []*github.User{}, err
 			}
@@ -81,7 +87,7 @@ func fetchUsers(client *github.Client, organizationName string, params GithubFet
 func resolveTeamID(client *github.Client, organizationName, teamName string) (int64, error) {
 	ctx := context.Background()
 
-	teams, _, err := client.Organizations.ListTeams(ctx, organizationName, &github.ListOptions{})
+	teams, _, err := client.Teams.ListTeams(ctx, organizationName, &github.ListOptions{})
 	if err != nil {
 		return -1, err
 	}
@@ -109,6 +115,29 @@ func fetchUserKeys(client *github.Client, usernames []string, token string) (map
 
 		for index, key := range keys {
 			result[username][index] = *key.Key
+		}
+	}
+
+	return result, nil
+}
+
+func fetchDeployKeys(client *github.Client, ownerRepos []string, token string) (map[string][]string, error) {
+	ctx := context.Background()
+
+	result := map[string][]string{}
+	for _, ownerRepo := range ownerRepos {
+		ownerRepoSplit := strings.SplitN(ownerRepo, "/", 2)
+		owner := ownerRepoSplit[0]
+		repo := ownerRepoSplit[1]
+		keys, _, err := client.Repositories.ListKeys(ctx, owner, repo, &github.ListOptions{})
+		if err != nil {
+			return map[string][]string{}, err
+		}
+
+		result[ownerRepo] = make([]string, len(keys))
+
+		for index, key := range keys {
+			result[ownerRepo][index] = *key.Key
 		}
 	}
 
