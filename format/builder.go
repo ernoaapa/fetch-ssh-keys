@@ -1,6 +1,6 @@
 package format
 
-import log "github.com/Sirupsen/logrus"
+import log "github.com/sirupsen/logrus"
 
 // Build builds output in given formatName format
 func Build(formatName string, keysByUsername map[string][]string, comment string) string {

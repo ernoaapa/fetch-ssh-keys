@@ -3,7 +3,7 @@ package format
 import (
 	"testing"
 
-	log "github.com/Sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 
 	"github.com/stretchr/testify/assert"
 )

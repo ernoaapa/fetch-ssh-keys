@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	log "github.com/Sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 	"github.com/google/go-github/github"
 	"golang.org/x/oauth2"
 )
