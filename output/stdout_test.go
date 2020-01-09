@@ -3,7 +3,7 @@ package output
 import (
 	"testing"
 
-	log "github.com/Sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 )
 
 func TestStdout(t *testing.T) {
